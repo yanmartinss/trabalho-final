@@ -1,130 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-#define MAX_VAL 255
-
-// Função para carregar uma imagem PGM
-unsigned char** load_pgm(const char* filename, int* width, int* height, int* max_val) {
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) {
-        perror("Erro ao abrir o arquivo");
-        exit(EXIT_FAILURE);
+void codificarPGMparaBinario(const char *input_pgm, const char *output_bin) {
+    FILE *pgm_file = fopen(input_pgm, "rb");
+    if (pgm_file == NULL) {
+        printf("Erro ao abrir a imagem PGM.\n");
+        exit(1);
     }
 
-    char format[3];
-    if (fscanf(file, "%2s", format) != 1 || format[0] != 'P' || format[1] != '2') {
-        fprintf(stderr, "Formato PGM não suportado\n");
-        fclose(file);
-        exit(EXIT_FAILURE);
+    FILE *bin_file = fopen(output_bin, "wb");
+    if (bin_file == NULL) {
+        printf("Erro ao criar o arquivo binário.\n");
+        fclose(pgm_file);
+        exit(1);
     }
 
-    // Ignorar comentários
-    int c;
-    while ((c = fgetc(file)) == '#') {
-        while (fgetc(file) != '\n');
-    }
-    ungetc(c, file); // Coloca o caractere lido de volta no stream
+    // Ler o cabeçalho do PGM
+    char formato[3];
+    int largura, altura, max_valor;
 
-    if (fscanf(file, "%d %d", width, height) != 2) {
-        fprintf(stderr, "Erro ao ler as dimensões da imagem\n");
-        fclose(file);
-        exit(EXIT_FAILURE);
-    }
-
-    if (fscanf(file, "%d", max_val) != 1) {
-        fprintf(stderr, "Erro ao ler o valor máximo\n");
-        fclose(file);
-        exit(EXIT_FAILURE);
+    fscanf(pgm_file, "%2s", formato);
+    if (formato[0] != 'P' || formato[1] != '5') {
+        printf("Formato PGM inválido. Esperado P5 (binário).\n");
+        fclose(pgm_file);
+        fclose(bin_file);
+        exit(1);
     }
 
-    unsigned char** image = (unsigned char**)malloc(*height * sizeof(unsigned char*));
-    if (image == NULL) {
-        perror("Erro ao alocar memória");
-        fclose(file);
-        exit(EXIT_FAILURE);
-    }
-    for (int i = 0; i < *height; i++) {
-        image[i] = (unsigned char*)malloc(*width * sizeof(unsigned char));
-        if (image[i] == NULL) {
-            perror("Erro ao alocar memória");
-            fclose(file);
-            exit(EXIT_FAILURE);
+    // Ler a largura, altura e o valor máximo de pixel
+    fscanf(pgm_file, "%d %d %d", &largura, &altura, &max_valor);
+    fgetc(pgm_file); // Consumir o caractere de nova linha após o cabeçalho
+
+    if (max_valor > 255) {
+        // Dividir a imagem em 4 quadrantes e processar por linha
+        int half_width = largura / 2;
+        int half_height = altura / 2;
+
+        unsigned char *linha = (unsigned char *)malloc(half_width * sizeof(unsigned char));
+        if (linha == NULL) {
+            printf("Erro de alocação de memória para a linha.\n");
+            fclose(pgm_file);
+            fclose(bin_file);
+            exit(1);
         }
-    }
 
-    for (int i = 0; i < *height; i++) {
-        for (int j = 0; j < *width; j++) {
-            int pixel;
-            if (fscanf(file, "%d", &pixel) != 1) {
-                fprintf(stderr, "Erro ao ler o pixel\n");
-                fclose(file);
-                exit(EXIT_FAILURE);
-            }
-            image[i][j] = (unsigned char)pixel;
-        }
-    }
+        for (int quadrante = 0; quadrante < 4; quadrante++) {
+            int start_x = (quadrante % 2) * half_width;
+            int start_y = (quadrante / 2) * half_height;
 
-    fclose(file);
-    return image;
-}
+            printf("Codificando quadrante %d...\n", quadrante + 1);
 
+            // Processar cada linha do quadrante
+            for (int y = 0; y < half_height; y++) {
+                // Calcular a posição correta para leitura no arquivo PGM
+                long posicao = ((start_y + y) * largura) + start_x;
+                fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
 
-// Verificar se um bloco da imagem é homogêneo
-bool is_homogeneous(unsigned char** image, int x, int y, int size, int width, int height) {
-    if (x + size > width || y + size > height) return false;
-
-    unsigned char first_pixel = image[y][x];
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            if (image[y + i][x + j] != first_pixel) {
-                return false;
+                fread(linha, sizeof(unsigned char), half_width, pgm_file);
+                fwrite(linha, sizeof(unsigned char), half_width, bin_file);
             }
         }
-    }
-    return true;
-}
 
-// Função de codificação recursiva usando quadtree
-void encode_quadtree(FILE* bitstream, unsigned char** image, int x, int y, int size, int width, int height) {
-    if (is_homogeneous(image, x, y, size, width, height)) {
-        fprintf(bitstream, "1 %d ", image[y][x]);  // 1 seguido do valor do pixel
+        free(linha);
     } else {
-        fprintf(bitstream, "0 ");  // 0 indica que será subdividido
-        int half = size / 2;
-        encode_quadtree(bitstream, image, x, y, half, width, height);               // Superior esquerdo
-        encode_quadtree(bitstream, image, x + half, y, half, width, height);         // Superior direito
-        encode_quadtree(bitstream, image, x, y + half, half, width, height);         // Inferior esquerdo
-        encode_quadtree(bitstream, image, x + half, y + half, half, width, height);  // Inferior direito
+        // Processar a imagem inteira se o valor máximo de pixel for 255 ou menos
+        unsigned char *linha = (unsigned char *)malloc(largura * sizeof(unsigned char));
+        if (linha == NULL) {
+            printf("Erro de alocação de memória para a linha.\n");
+            fclose(pgm_file);
+            fclose(bin_file);
+            exit(1);
+        }
+
+        for (int y = 0; y < altura; y++) {
+            fread(linha, sizeof(unsigned char), largura, pgm_file);
+            fwrite(linha, sizeof(unsigned char), largura, bin_file);
+        }
+
+        free(linha);
     }
+
+    fclose(pgm_file);
+    fclose(bin_file);
+
+    printf("Arquivo %s criado com sucesso.\n", output_bin);
 }
 
-int main(int argc, char* argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Uso: %s <imagem_entrada.pgm> <bitstream_saida.bin>\n", argv[0]);
-        return EXIT_FAILURE;
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Uso: %s <arquivo_pgm>\n", argv[0]);
+        return 1;
     }
 
-    const char* input_pgm = argv[1];
-    const char* bitstream_file = argv[2];
+    const char *input_pgm = argv[1];
+    const char *output_bin = "./bitstream/bitstream.bin";
 
-    int width, height, max_val;
-    unsigned char** image = load_pgm(input_pgm, &width, &height, &max_val);
+    codificarPGMparaBinario(input_pgm, output_bin);
 
-    FILE* bitstream = fopen(bitstream_file, "wb");
-    if (bitstream == NULL) {
-        perror("Erro ao abrir o arquivo de bitstream");
-        return EXIT_FAILURE;
-    }
-
-    encode_quadtree(bitstream, image, 0, 0, width, width, height);
-
-    fclose(bitstream);
-
-    for (int i = 0; i < height; i++) {
-        free(image[i]);
-    }
-    free(image);
-
-    return EXIT_SUCCESS;
+    return 0;
 }
