@@ -6,12 +6,12 @@ bool verificarQuadranteHomogeneo(FILE *pgm_file, int largura, int altura, int st
     // Verificar se o quadrante é homogêneo
     unsigned char primeiro_pixel, pixel;
     long posicao = (start_y * largura) + start_x;
-    fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
+    fseek(pgm_file, posicao, SEEK_SET);  // Ajustado aqui, removido ftell()
     fread(&primeiro_pixel, sizeof(unsigned char), 1, pgm_file);
 
     for (int y = 0; y < quadrante_altura; y++) {
         posicao = ((start_y + y) * largura) + start_x;
-        fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
+        fseek(pgm_file, posicao, SEEK_SET);  // Ajustado aqui, removido ftell()
 
         for (int x = 0; x < quadrante_largura; x++) {
             fread(&pixel, sizeof(unsigned char), 1, pgm_file);
@@ -108,7 +108,7 @@ void codificarPGMparaBinario(const char *input_pgm, const char *output_bin) {
             // Processar cada linha do quadrante
             for (int y = 0; y < half_height; y++) {
                 long posicao = ((start_y + y) * largura) + start_x;
-                fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
+                fseek(pgm_file, posicao, SEEK_SET);  // Ajustado aqui, removido ftell()
 
                 fread(linha, sizeof(unsigned char), half_width, pgm_file);
                 fwrite(linha, sizeof(unsigned char), half_width, bin_file);
