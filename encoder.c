@@ -1,5 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
+bool verificarQuadranteHomogeneo(FILE *pgm_file, int largura, int altura, int start_x, int start_y, int quadrante_largura, int quadrante_altura) {
+    // Verificar se o quadrante é homogêneo
+    unsigned char primeiro_pixel, pixel;
+    long posicao = (start_y * largura) + start_x;
+    fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
+    fread(&primeiro_pixel, sizeof(unsigned char), 1, pgm_file);
+
+    for (int y = 0; y < quadrante_altura; y++) {
+        posicao = ((start_y + y) * largura) + start_x;
+        fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
+
+        for (int x = 0; x < quadrante_largura; x++) {
+            fread(&pixel, sizeof(unsigned char), 1, pgm_file);
+            if (pixel != primeiro_pixel) {
+                return false; // Não é homogêneo
+            }
+        }
+    }
+    return true; // Homogêneo
+}
 
 void codificarPGMparaBinario(const char *input_pgm, const char *output_bin) {
     FILE *pgm_file = fopen(input_pgm, "rb");
@@ -31,10 +53,43 @@ void codificarPGMparaBinario(const char *input_pgm, const char *output_bin) {
     fscanf(pgm_file, "%d %d %d", &largura, &altura, &max_valor);
     fgetc(pgm_file); // Consumir o caractere de nova linha após o cabeçalho
 
-    if (max_valor > 255) {
-        // Dividir a imagem em 4 quadrantes e processar por linha
-        int half_width = largura / 2;
-        int half_height = altura / 2;
+    // Dividir a imagem em 4 quadrantes
+    int half_width = largura / 2;
+    int half_height = altura / 2;
+    bool homogeneo = true;
+
+    for (int quadrante = 0; quadrante < 4; quadrante++) {
+        int start_x = (quadrante % 2) * half_width;
+        int start_y = (quadrante / 2) * half_height;
+
+        if (!verificarQuadranteHomogeneo(pgm_file, largura, altura, start_x, start_y, half_width, half_height)) {
+            homogeneo = false;
+            break;
+        }
+    }
+
+    rewind(pgm_file); // Voltar ao início do arquivo para ler os dados novamente
+
+    if (!homogeneo) {
+        printf("A imagem não é homogênea. Codificando normalmente...\n");
+
+        // Processar a imagem inteira
+        unsigned char *linha = (unsigned char *)malloc(largura * sizeof(unsigned char));
+        if (linha == NULL) {
+            printf("Erro de alocação de memória para a linha.\n");
+            fclose(pgm_file);
+            fclose(bin_file);
+            exit(1);
+        }
+
+        for (int y = 0; y < altura; y++) {
+            fread(linha, sizeof(unsigned char), largura, pgm_file);
+            fwrite(linha, sizeof(unsigned char), largura, bin_file);
+        }
+
+        free(linha);
+    } else {
+        printf("A imagem é homogênea. Dividindo em quadrantes...\n");
 
         unsigned char *linha = (unsigned char *)malloc(half_width * sizeof(unsigned char));
         if (linha == NULL) {
@@ -52,29 +107,12 @@ void codificarPGMparaBinario(const char *input_pgm, const char *output_bin) {
 
             // Processar cada linha do quadrante
             for (int y = 0; y < half_height; y++) {
-                // Calcular a posição correta para leitura no arquivo PGM
                 long posicao = ((start_y + y) * largura) + start_x;
                 fseek(pgm_file, posicao + ftell(pgm_file), SEEK_SET);
 
                 fread(linha, sizeof(unsigned char), half_width, pgm_file);
                 fwrite(linha, sizeof(unsigned char), half_width, bin_file);
             }
-        }
-
-        free(linha);
-    } else {
-        // Processar a imagem inteira se o valor máximo de pixel for 255 ou menos
-        unsigned char *linha = (unsigned char *)malloc(largura * sizeof(unsigned char));
-        if (linha == NULL) {
-            printf("Erro de alocação de memória para a linha.\n");
-            fclose(pgm_file);
-            fclose(bin_file);
-            exit(1);
-        }
-
-        for (int y = 0; y < altura; y++) {
-            fread(linha, sizeof(unsigned char), largura, pgm_file);
-            fwrite(linha, sizeof(unsigned char), largura, bin_file);
         }
 
         free(linha);
