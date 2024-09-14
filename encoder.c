@@ -6,30 +6,20 @@
 bool verificarQuadranteHomogeneo(FILE *pgm_file, int largura, int altura, int start_x, int start_y, int quadrante_largura, int quadrante_altura);
 void codificarPGMparaBitstream(const char *input_pgm, const char *output_bin);
 void dividirEProcessarQuadrantes(FILE *pgm_file, int largura, int altura, int start_x, int start_y, int quadrante_largura, int quadrante_altura, FILE *bin_file);
-void ignorarComentarios(FILE *pgm_file);
 
 // Função principal
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Uso: %s <arquivo_pgm>\n", argv[0]);
+        printf("Uso: %s <arquivo_pgm> <arquivo_bin>\n", argv[0]);
         return 1;
     }
 
     const char *input_pgm = argv[1];
-    const char *output_bin = "./bitstream/bitstream.bin"; // Arquivo de saída
+    const char *output_bin = argv[2]; // Arquivo de saída
 
     codificarPGMparaBitstream(input_pgm, output_bin);
 
     return 0;
-}
-
-// Função para ignorar comentários no arquivo PGM
-void ignorarComentarios(FILE *pgm_file) {
-    int ch;
-    while ((ch = fgetc(pgm_file)) == '#') {  // Enquanto for comentário
-        while (fgetc(pgm_file) != '\n');     // Ignora o resto da linha
-    }
-    ungetc(ch, pgm_file);  // Devolve o último caractere lido que não era '#'
 }
 
 // Verifica se o quadrante é homogêneo
@@ -73,7 +63,6 @@ void codificarPGMparaBitstream(const char *input_pgm, const char *output_bin) {
     int largura, altura, max_valor;
 
     fscanf(pgm_file, "%2s", formato);  // Ler o formato (P5)
-    ignorarComentarios(pgm_file);      // Ignorar possíveis comentários
 
     if (formato[0] != 'P' || formato[1] != '5') {
         printf("Formato PGM inválido. Esperado P5 (binário).\n");
@@ -84,7 +73,6 @@ void codificarPGMparaBitstream(const char *input_pgm, const char *output_bin) {
 
     // Ler a largura, altura e o valor máximo de pixel
     fscanf(pgm_file, "%d %d", &largura, &altura);
-    ignorarComentarios(pgm_file);      // Ignorar possíveis comentários
     fscanf(pgm_file, "%d", &max_valor);
     fgetc(pgm_file); // Consumir o caractere de nova linha após o cabeçalho
 
