@@ -24,4 +24,6 @@ O formato de imagem utilizado é o PGM (Portable GrayMap), que armazena imagens 
 
 ## ✒️ Membros da equipe
 
+Artur Moreira Martins, Guilherme Amaro Clarindo, Vênancio Silva Clarindo e Yan Martins de Sousa
+
 
