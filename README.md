@@ -6,7 +6,6 @@ O formato de imagem utilizado é o PGM (Portable GrayMap), que armazena imagens 
 
 ## ⚙️ Executando os testes
 
-Criar a imagem: ./pgm ../dataset/img02.pgm ../dataset/novasImagens/novaimg02.pgm
 
 ### 🔩 Analise os testes de ponta a ponta
 
