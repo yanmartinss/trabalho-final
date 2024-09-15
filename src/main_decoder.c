@@ -6,40 +6,47 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    const char *input_bin = argv[1]; 
-    const char *output_pgm = argv[2];
+    // Definição dos caminhos dos arquivos de entrada e saída
+    const char *input_bin = argv[1];  // Arquivo binário de entrada
+    const char *output_pgm = argv[2]; // Arquivo PGM de saída
 
+    // Abrir o arquivo binário para leitura
     FILE *bin_file = fopen(input_bin, "rb");
     if (!bin_file) {
         puts("Erro ao abrir o arquivo binário.\n");
         return 1;
     }
 
-    int largura, altura;
-    fread(&largura, sizeof(int), 1, bin_file);
-    fread(&altura, sizeof(int), 1, bin_file);
+    // Ler a largura e altura da imagem do arquivo binário
+    int width, height;
+    fread(&width, sizeof(int), 1, bin_file);
+    fread(&height, sizeof(int), 1, bin_file);
 
-    QuadtreeNode *root = lerQuadtree(bin_file);
+    // Ler a quadtree do arquivo binário
+    struct QuadtreeNode *root = readQuadtree(bin_file);
     fclose(bin_file);
 
-    unsigned char *pData = (unsigned char *)malloc(largura * altura * sizeof(unsigned char));
+    // Alocar memória para os dados da imagem
+    unsigned char *pData = (unsigned char *)malloc(width * height * sizeof(unsigned char));
 
-    reconstruirImagem(root, pData, 0, 0, largura, altura, largura);
+    // Reconstruir a imagem a partir da quadtree
+    reconstructImage(root, pData, 0, 0, width, height, width);
 
+    // Criar o arquivo PGM para a imagem de saída
     FILE *pgm_file = fopen(output_pgm, "wb");
     if (!pgm_file) {
         puts("Erro ao criar o arquivo PGM.\n");
         free(pData);
-        liberarQuadtree(root);
+        freeQuadtree(root);
         return 1;
     }
 
-    fprintf(pgm_file, "P5\n%d %d\n255\n", largura, altura);
-    fwrite(pData, sizeof(unsigned char), largura * altura, pgm_file);
+    fprintf(pgm_file, "P5\n%d %d\n255\n", width, height);
+    fwrite(pData, sizeof(unsigned char), width * height, pgm_file);
     fclose(pgm_file);
 
     free(pData);
-    liberarQuadtree(root);
+    freeQuadtree(root);
 
     printf("Imagem %s reconstruída com sucesso.\n", output_pgm);
     return 0;
