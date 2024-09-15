@@ -19,26 +19,17 @@ O projeto está dividido em duas partes principais:
 2. **Decodificador (main_decoder.c)**  
    Lê o arquivo binário gerado pelo codificador e reconstrói a imagem PGM original utilizando a quadtree.
 
-## ⚙️ Executando os testes
+## Estrutura do Projeto
 
-
-### 🔩 Analise os testes de ponta a ponta
-
-
-
-### ⌨️ E testes de estilo de codificação
-
-
-
-## 📦 Implantação
-
-
-## 🛠️ Construído com
-
-
-
-## ✒️ Membros da equipe
-
-Artur Moreira Martins, Guilherme Amaro Clarindo, Venâncio Silva Clarindo e Yan Martins de Sousa
-
-
+```bash
+├── include
+│   ├── quadtree.h          # Definições para a quadtree
+│   ├── quadtree_decoder.h  # Definições para o decodificador
+├── src
+│   ├── main.c              # Código principal do codificador
+│   ├── main_decoder.c      # Código principal do decodificador
+│   ├── quadtree.c          # Implementação da quadtree
+│   ├── quadtree_decoder.c  # Implementação do decodificador
+├── bin                     # Diretório para os arquivos binários gerados
+├── build                   # Diretório para os arquivos objeto (.o)
+└── Makefile                # Script para compilar o projeto
