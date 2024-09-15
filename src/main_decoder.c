@@ -1,3 +1,13 @@
+/*********************************************************************************************/
+/* Alunos      : Yan Martins de Sousa - Matrícula: 20232045050392                            */
+/*               Artur Moreira Martins - Matrícula: 20231045050262                           */
+/*               Guilherme Amaro Clarindo - Matrícula: 20231045050050                        */
+/*               Vênancio Silva Clarindo - Matrícula: XXXXXXXXXXXXXX                         */
+/* Avaliação   : Trabalho Final                                                              */
+/* Data        : 04/05/2024 - Professor: Daniel Ferreira                                     */
+/* Compilador  : gcc versão 6.3.0                                                            */
+/*********************************************************************************************/
+
 #include "quadtree_decoder.h"
 
 int main(int argc, char *argv[]) {
@@ -6,33 +16,26 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Definição dos caminhos dos arquivos de entrada e saída
-    const char *input_bin = argv[1];  // Arquivo binário de entrada
-    const char *output_pgm = argv[2]; // Arquivo PGM de saída
+    const char *input_bin = argv[1]; 
+    const char *output_pgm = argv[2];
 
-    // Abrir o arquivo binário para leitura
     FILE *bin_file = fopen(input_bin, "rb");
     if (!bin_file) {
         puts("Erro ao abrir o arquivo binário.\n");
         return 1;
     }
 
-    // Ler a largura e altura da imagem do arquivo binário
     int width, height;
     fread(&width, sizeof(int), 1, bin_file);
     fread(&height, sizeof(int), 1, bin_file);
 
-    // Ler a quadtree do arquivo binário
     struct QuadtreeNode *root = readQuadtree(bin_file);
     fclose(bin_file);
 
-    // Alocar memória para os dados da imagem
     unsigned char *pData = (unsigned char *)malloc(width * height * sizeof(unsigned char));
 
-    // Reconstruir a imagem a partir da quadtree
     reconstructImage(root, pData, 0, 0, width, height, width);
 
-    // Criar o arquivo PGM para a imagem de saída
     FILE *pgm_file = fopen(output_pgm, "wb");
     if (!pgm_file) {
         puts("Erro ao criar o arquivo PGM.\n");

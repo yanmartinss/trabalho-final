@@ -1,6 +1,15 @@
+/*********************************************************************************************/
+/* Alunos      : Yan Martins de Sousa - Matrícula: 20232045050392                            */
+/*               Artur Moreira Martins - Matrícula: 20231045050262                           */
+/*               Guilherme Amaro Clarindo - Matrícula: 20231045050050                        */
+/*               Vênancio Silva Clarindo - Matrícula: XXXXXXXXXXXXXX                         */
+/* Avaliação   : Trabalho Final                                                              */
+/* Data        : 04/05/2024 - Professor: Daniel Ferreira                                     */
+/* Compilador  : gcc versão 6.3.0                                                            */
+/*********************************************************************************************/
+
 #include "quadtree_decoder.h"
 
-// Função para ler a quadtree do arquivo binário
 struct QuadtreeNode* readQuadtree(FILE *fp) {
     struct QuadtreeNode *node = (struct QuadtreeNode *)malloc(sizeof(struct QuadtreeNode));
     fread(&node->isLeaf, sizeof(int), 1, fp);
@@ -17,7 +26,6 @@ struct QuadtreeNode* readQuadtree(FILE *fp) {
     return node;
 }
 
-// Função para reconstruir a imagem a partir da quadtree
 void reconstructImage(struct QuadtreeNode *node, unsigned char *pData, int x, int y, int width, int height, int imgWidth) {
     if (node->isLeaf) {
         for (int i = 0; i < height; i++) {
@@ -36,7 +44,6 @@ void reconstructImage(struct QuadtreeNode *node, unsigned char *pData, int x, in
     }
 }
 
-// Função para liberar a memória da quadtree
 void freeQuadtree(struct QuadtreeNode *node) {
     if (node) {
         freeQuadtree(node->topLeft);
