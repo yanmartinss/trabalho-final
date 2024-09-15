@@ -1,35 +1,29 @@
 # Trabalho Final - Laboratório de Programação
 
-Este projeto implementa a construção e decodificação de imagens utilizando a estrutura de dados **Quadtree**. O objetivo é compactar imagens no formato PGM (Portable GrayMap) e armazená-las em um arquivo binário, além de realizar a reconstrução da imagem a partir desse arquivo binário.
+Este projeto implementa um algoritmo de compressão de imagens baseado em uma decomposição de blocos quadrados, utilizando a linguagem C. 
+O objetivo é reduzir o tamanho de uma imagem, dividindo-a em blocos homogêneos de acordo com um critério de homogeneidade e reconstruindo a imagem a partir de um bitstream comprimido. 
+O formato de imagem utilizado é o PGM (Portable GrayMap), que armazena imagens em tons de cinza.
 
-## Integrantes da Equipe
+## ⚙️ Executando os testes
 
-- **Artur Moreira Martins**
-- **Guilherme Amaro Clarindo**
-- **Vênancio Silva Clarindo**
-- **Yan Martins de Sousa**
 
-## Visão Geral do Projeto
+### 🔩 Analise os testes de ponta a ponta
 
-O projeto está dividido em duas partes principais:
 
-1. **Codificador (main.c)**  
-   Responsável por ler a imagem PGM, construir a quadtree, e armazenar as informações compactadas em um arquivo binário. A quadtree permite a compressão ao representar regiões homogêneas da imagem de forma eficiente.
 
-2. **Decodificador (main_decoder.c)**  
-   Lê o arquivo binário gerado pelo codificador e reconstrói a imagem PGM original utilizando a quadtree.
+### ⌨️ E testes de estilo de codificação
 
-## Estrutura do Projeto
 
-```bash
-├── include
-│   ├── quadtree.h          # Definições para a quadtree
-│   ├── quadtree_decoder.h  # Definições para o decodificador
-├── src
-│   ├── main.c              # Código principal do codificador
-│   ├── main_decoder.c      # Código principal do decodificador
-│   ├── quadtree.c          # Implementação da quadtree
-│   ├── quadtree_decoder.c  # Implementação do decodificador
-├── bin                     # Diretório para os arquivos binários gerados
-├── build                   # Diretório para os arquivos objeto (.o)
-└── Makefile                # Script para compilar o projeto
+
+## 📦 Implantação
+
+
+## 🛠️ Construído com
+
+
+
+## ✒️ Membros da equipe
+
+Artur Moreira Martins, Guilherme Amaro Clarindo, Vênancio Silva Clarindo e Yan Martins de Sousa
+
+
