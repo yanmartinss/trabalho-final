@@ -6,7 +6,7 @@ Este projeto implementa a construção e decodificação de imagens utilizando a
 
 - **Artur Moreira Martins**
 - **Guilherme Amaro Clarindo**
-- **Vênancio Silva Clarindo**
+- **Venâncio Silva Clarindo**
 - **Yan Martins de Sousa**
 
 ## Visão Geral do Projeto
