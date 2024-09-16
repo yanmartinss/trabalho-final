@@ -30,6 +30,7 @@ O projeto está dividido em duas partes principais:
 │   ├── main_decoder.c      # Código principal do decodificador
 │   ├── quadtree.c          # Implementação da quadtree
 │   ├── quadtree_decoder.c  # Implementação do decodificador
-├── bin                     # Diretório para os arquivos binários gerados
+├── bin                     # Diretório para os executáveis
+├── bitstream               # Diretório para os arquivos binários gerados
 ├── build                   # Diretório para os arquivos objeto (.o)
 └── Makefile                # Script para compilar o projeto
