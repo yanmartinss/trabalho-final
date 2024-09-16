@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) { //função principal que recebe argumentos da
     }
 
     int width, height;
-    fread(&width, sizeof(int), 1, bin_file); //Lê a largura e altura da imagem do arquivo binário. 
+    fread(&width, sizeof(int), 1, bin_file); //Lê as dimensões da imagem do arquivo binário. 
     fread(&height, sizeof(int), 1, bin_file); //Cada uma dessas informações ocupa 4 bytes . O fread lê esses valores do arquivo e os armazena nas variáveis width e height.
 
     struct QuadtreeNode *root = readQuadtree(bin_file); //Chama a função readQuadtree, que lê a árvore quaternária do arquivo binário e retorna um ponteiro para a raiz da árvore, armazenado em root.
