@@ -2,7 +2,7 @@
 /* Alunos      : Yan Martins de Sousa - Matrícula: 20232045050392                            */
 /*               Artur Moreira Martins - Matrícula: 20231045050262                           */
 /*               Guilherme Amaro Clarindo - Matrícula: 20231045050050                        */
-/*               Vênancio Silva Clarindo - Matrícula: XXXXXXXXXXXXXX                         */
+/*               Vênancio Silva Clarindo - Matrícula: 20232045050066                         */
 /* Avaliação   : Trabalho Final                                                              */
 /* Data        : 04/05/2024 - Professor: Daniel Ferreira                                     */
 /* Compilador  : gcc versão 6.3.0                                                            */
